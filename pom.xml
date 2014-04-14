@@ -25,6 +25,11 @@
 		</dependency>
 	</dependencies>
 
+	<ciManagement>
+		<system>Jenkins</system>
+		<url>http://jenkins.imagej.net/job/View5D/</url>
+	</ciManagement>
+
 	<scm>
 		<connection>scm:git:git://github.com/fiji/View5D</connection>
 		<developerConnection>scm:git:git@github.com:fiji/View5D</developerConnection>
