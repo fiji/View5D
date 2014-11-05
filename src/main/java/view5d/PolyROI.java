@@ -23,7 +23,7 @@ package view5d;
 
 
 // import java.io.*;
-import java.awt.*;
+import java.awt.Polygon;
 
 // A ROI class based on three Polygons who's orthogonal overlap is the 3D ROI
 class PolyROI extends ROI {

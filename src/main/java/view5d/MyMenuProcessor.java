@@ -23,7 +23,8 @@ package view5d;
 
 
 // import java.io.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 // Now the Action Listener processing all menu event by being associated to a characted
 class MyMenuProcessor implements ActionListener {

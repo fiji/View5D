@@ -24,8 +24,8 @@
 // import java.awt.color.*;
 package view5d;
 
-import java.util.*;
-import java.text.*;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public abstract class AnElement extends Object {
     // Different Data Types, tags listed below

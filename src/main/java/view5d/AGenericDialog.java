@@ -25,10 +25,28 @@
 // import java.lang.Number.*;
 package view5d;
 
-import java.awt.event.*;
-import java.awt.*;
+import java.awt.Button;
+import java.awt.Component;
+import java.awt.Dialog;
 // import ij.*;
 // import ij.gui.*;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Label;
+import java.awt.Panel;
+import java.awt.TextArea;
+import java.awt.TextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 class AGenericDialog extends Dialog implements WindowListener,ActionListener, FocusListener, ItemListener {  // an easy class for generating user interaction
     static final long serialVersionUID = 1;

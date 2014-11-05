@@ -23,12 +23,21 @@
 // import java.io.*;
 package view5d;
 
-import java.awt.image.*;
-import java.awt.event.*;
+import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.*;
-import java.util.*;
-import java.text.*;
+import java.awt.GridLayout;
+import java.awt.Menu;
+import java.awt.MenuItem;
+import java.awt.Panel;
+import java.awt.PopupMenu;
+import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.image.ImageObserver;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class PixelDisplay extends Panel implements MouseListener,ImageObserver,KeyListener {  // A panel displaying the multi-element contens of a single pixel
     static final long serialVersionUID = 1;

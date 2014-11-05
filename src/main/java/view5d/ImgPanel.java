@@ -23,8 +23,16 @@
 package view5d;
 
 // import java.io.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.Label;
+import java.awt.Menu;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
+import java.awt.Panel;
 // import ij.*;
+import java.awt.Scrollbar;
 
 // This class manages constructing the application
 public class ImgPanel extends Panel {

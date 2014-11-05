@@ -23,10 +23,18 @@
 // import java.io.*;
 package view5d;
 
-import java.awt.event.*;
-import java.awt.*;
-import java.util.*;
-import java.text.*;
+import java.awt.CheckboxMenuItem;
+import java.awt.GridLayout;
+import java.awt.Label;
+import java.awt.Menu;
+import java.awt.Panel;
+import java.awt.PopupMenu;
+import java.awt.Scrollbar;
+import java.awt.TextArea;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class PositionLabel extends Panel implements MouseListener{
     static final long serialVersionUID = 1;

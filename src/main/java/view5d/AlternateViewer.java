@@ -24,9 +24,12 @@
 // import java.awt.image.ColorModel.*;
 package view5d;
 
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.Container;
 // import java.awt.color.*;
-import java.awt.*;
+import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.event.WindowListener;
 
 public class AlternateViewer extends Frame implements WindowListener {
  static final long serialVersionUID = 1;

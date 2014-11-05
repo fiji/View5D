@@ -23,7 +23,7 @@ package view5d;
 
 
 // import java.io.*;
-import java.awt.*;
+import java.awt.Rectangle;
 
 class RectROI extends ROI {
     int ProjMin[], ProjMax[];

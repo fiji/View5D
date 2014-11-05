@@ -23,12 +23,33 @@
 // import java.io.*;
 package view5d;
 
-import java.awt.image.*;
-import java.awt.event.*;
-import java.awt.*;
-import java.util.*;
-import java.text.*;
-import ij.gui.*;  // for export of plotwindow
+import ij.gui.PlotWindow;  // for export of plotwindow
+
+import java.awt.Canvas;
+import java.awt.CheckboxMenuItem;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Event;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Menu;
+import java.awt.MenuItem;
+import java.awt.Polygon;
+import java.awt.PopupMenu;
+import java.awt.Rectangle;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.image.ImageObserver;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Vector;
 
 // a canvas represents one view of the data
 public class ImageCanvas extends Canvas implements ImageObserver,MouseListener,MouseMotionListener,KeyListener,FocusListener,AdjustmentListener {

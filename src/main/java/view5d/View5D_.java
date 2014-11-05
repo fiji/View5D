@@ -21,15 +21,23 @@
 // By making the appropriate class "View5D" or "View5D_" public and renaming the file, this code can be toggled between Applet and ImageJ respectively
 package view5d;
 
-import java.awt.event.*;
-import java.awt.*;
-import java.util.*;
-import java.text.*;
+import ij.IJ;
+import ij.ImagePlus;
+import ij.ImageStack;
+import ij.LookUpTable;
+import ij.WindowManager;
+import ij.gui.GUI;
+import ij.plugin.PlugIn;
 import ij.plugin.frame.PlugInFrame;
-import ij.*;
-import ij.plugin.*;
-import ij.process.*;
-import ij.gui.*;
+import ij.process.ImageProcessor;
+
+import java.awt.BorderLayout;
+import java.awt.MenuBar;
+import java.awt.TextArea;
+import java.awt.event.WindowListener;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Vector;
 
 /* The code below is necessary to include the software as a plugin into ImageJ */
 public class View5D_ extends PlugInFrame implements PlugIn, WindowListener {

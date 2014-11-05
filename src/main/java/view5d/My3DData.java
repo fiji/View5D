@@ -22,15 +22,33 @@
 
 package view5d;
 
-import java.io.*;
-import java.net.*;
-import java.awt.image.*;
+import ij.ImagePlus;
+import ij.gui.NewImage;
+
 import java.applet.Applet;
-import java.awt.*;
-import java.util.*;
-import java.text.*;
-import ij.*;
-import ij.gui.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.EventQueue;
+import java.awt.Image;
+import java.awt.Label;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.image.IndexColorModel;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.StreamTokenizer;
+import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Vector;
 
 public class My3DData extends Object {
     public String markerInfilename=null;

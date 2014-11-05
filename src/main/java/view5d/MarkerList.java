@@ -22,7 +22,7 @@
 package view5d;
 
 
-import java.util.*;
+import java.util.Vector;
 
 class MarkerList extends Object {
     int NumPoints = 0;  // Number of Points in the active list

@@ -23,9 +23,11 @@
 // import java.io.*;
 package view5d;
 
-import java.awt.image.*;
-import java.awt.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Polygon;
+import java.awt.image.IndexColorModel;
+import java.util.Random;
+import java.util.Vector;
 
 public class Bundle extends Object implements Cloneable {  // this class bundles some user-defined values seperately for each element
     private double mincs=0.0,maxcs=1.0;

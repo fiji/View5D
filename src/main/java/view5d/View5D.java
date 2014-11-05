@@ -23,8 +23,9 @@
 package view5d;
 
 import java.applet.Applet;
-import java.awt.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.TextArea;
+import java.util.Vector;
 // import view5d.*;
 
 // insert : "public" before this to make it an applet
