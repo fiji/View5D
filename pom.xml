@@ -16,7 +16,7 @@
 	<description />
 
 	<developers>
-			<developer>
+		<developer>
 			<id>ctrueden</id>
 			<name>Curtis Rueden</name>
 			<url>http://imagej.net/User:Rueden</url>
@@ -48,7 +48,7 @@
 			<name>Jean-Yves Tinevez</name>
 			<url>http://imagej.net/User:JeanYvesTinevez</url>
 			<properties><id>tinevez</id></properties>
-	</contributor>
+		</contributor>
 	</contributors>
 
 	<scm>
