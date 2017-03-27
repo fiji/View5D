@@ -85,8 +85,8 @@
 		<url>https://github.com/fiji/View5D/issues</url>
 	</issueManagement>
 	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://jenkins.imagej.net/job/View5D/</url>
+		<system>Travis CI</system>
+		<url>https://travis-ci.org/fiji/View5D</url>
 	</ciManagement>
 
 	<properties>
