@@ -23,16 +23,9 @@
 package view5d;
 
 // import java.io.*;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.GridLayout;
-import java.awt.Label;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
-import java.awt.Panel;
+import java.awt.*;
+import java.lang.System.*;
 // import ij.*;
-import java.awt.Scrollbar;
 
 // This class manages constructing the application
 public class ImgPanel extends Panel {
@@ -62,31 +55,40 @@ public class ImgPanel extends Panel {
         }
   
    public void CheckScrollBar() {
-                if (data3d.Times > 1)
+	   //System.out.println("CheckScrollBar: "+data3d.Times+" timesteps.\n");
+	   //System.out.println("Objects: Applet: "+System.identityHashCode(applet)+" , Data: "+data3d+", this Panel: "+System.identityHashCode(this)+", DataPanel: "+System.identityHashCode(DataPanel)+"\n");
+    	if (data3d.Times > 1)
                 {
                 	Scrollbar Slider=label.TimeScrollbar;
-                	if (! ScrollbarPresent ) {
-                    Slider=new Scrollbar(Scrollbar.VERTICAL, 0, 1, 0, data3d.Times);
-                    ScrollbarPresent=true;
-                    label.TimeScrollbar=Slider;  // that it will be moved when browsing though the data
-                    add("East",Slider);
-                    //data3d.ShowAllSlices=true;
-                    data3d.TrackDirection=4;
-                    if (data3d.SizeZ > 1)
-                    {
-                        data3d.SearchZ=1;
-                        data3d.COMZ=1;
-                    }
+                	if (! ScrollbarPresent) { //
+						// System.out.println("Adding a Scrollbar with "+data3d.Times+" timesteps.\n");
+						Slider=new Scrollbar(Scrollbar.VERTICAL, 0, 1, 0, data3d.Times);
+                    	ScrollbarPresent=true;
+						label.TimeScrollbar = Slider;  // that it will be moved when browsing though the data
+						add("East", Slider);
+						//if (DataPanel != null)
+						//	DataPanel.CheckScrollBar();
+						//data3d.ShowAllSlices=true;
+						data3d.TrackDirection = 4;
+						if (data3d.SizeZ > 1) {
+							data3d.SearchZ = 1;
+							data3d.COMZ = 1;
+						}
                     Slider.setBlockIncrement(data3d.Times / 10 + 1);
                     Slider.addAdjustmentListener(c1);
+                    Slider.setVisible(true);
                 	}
-                	else
-                		Slider.setMaximum(data3d.Times);
-                    this.doLayout();
+                	else {
+						Slider.setMaximum(data3d.Times);
+						// System.out.println("Changed Scrollbar size to"+data3d.Times+" timesteps.\n");
+						Slider.setBlockIncrement(data3d.Times / 10 + 1);
+						Slider.setVisible(true);
+					}
+                	Slider.doLayout();
+                	this.doLayout();
                 }
-                else
-                	if (data3d.Elements > 5)
-                        data3d.TrackDirection=3;
+//                if (data3d.Elements > 5)
+//                	data3d.TrackDirection=3;
  }
 
     public void setPositions(APoint ap) {

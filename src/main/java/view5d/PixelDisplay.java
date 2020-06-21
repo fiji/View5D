@@ -23,21 +23,12 @@
 // import java.io.*;
 package view5d;
 
-import java.awt.Color;
+import java.awt.image.*;
+import java.awt.event.*;
 import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Menu;
-import java.awt.MenuItem;
-import java.awt.Panel;
-import java.awt.PopupMenu;
-import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.image.ImageObserver;
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.awt.*;
+import java.util.*;
+import java.text.*;
 
 public class PixelDisplay extends Panel implements MouseListener,ImageObserver,KeyListener {  // A panel displaying the multi-element contens of a single pixel
     static final long serialVersionUID = 1;
@@ -183,8 +174,8 @@ public class PixelDisplay extends Panel implements MouseListener,ImageObserver,K
     {
     	Rectangle r = getBounds();
        	int elements = data3d.GetNumElements();
-	int elem = data3d.GetActiveElement();
-	double sizex = (r.width-1)/(double) elements;
+	    int elem = data3d.GetActiveElement();
+	    double sizex = (r.width-1)/(double) elements;
         int sizey = (r.height-1)/ 4;
 
         for (int e=0;e < elements;e++)
@@ -195,6 +186,7 @@ public class PixelDisplay extends Panel implements MouseListener,ImageObserver,K
                 	g.drawLine((int) (e*sizex), y, (int) ((e+1)*sizex), y);
 		}
                 g.setColor(Color.white);
+                g.setFont(new Font(data3d.FontType, Font.PLAIN, data3d.FontSize));
                 if (e == data3d.HistoX)
                     g.drawString("HX",(int)(e*sizex+5),(int)(1.0*sizey)); // +(1*sizex/3-10)
                 if (e == data3d.HistoY)
@@ -234,6 +226,7 @@ public class PixelDisplay extends Panel implements MouseListener,ImageObserver,K
                 g.setColor(GetMarkerColor(e));
                 g.fillRect((int) (e*sizex), 3*sizey,(int)((e+1)*sizex), 4*sizey);
                 g.setColor(Color.white);
+                g.setFont(new Font(data3d.FontType, Font.PLAIN, data3d.FontSize));
                 if (e == data3d.HistoX)
                     g.drawString("HX",(int)(e*sizex+5),(int)(4.2*sizey));
                 if (e == data3d.HistoY)
@@ -518,11 +511,12 @@ public class PixelDisplay extends Panel implements MouseListener,ImageObserver,K
             }
     }
     g.setColor(Color.white);
+    g.setFont(new Font(data3d.FontType, Font.PLAIN, data3d.FontSize));
     g.drawString(TextToDisplay,12,12); //  r.width - TextToDisplay.length() * 9 , 12); 
     g.drawString(XTitle,r.width - XTitle.length() * 9,r.height - 15);
 
     NumberFormat nf2 = java.text.NumberFormat.getNumberInstance(Locale.US);
-    nf2.setMaximumFractionDigits(4);
+    nf2.setMaximumFractionDigits(6);
     nf2.setGroupingUsed(false);
 
     g.drawString(nf2.format(printval),12,r.height - 20); 

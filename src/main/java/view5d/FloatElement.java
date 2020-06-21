@@ -70,8 +70,14 @@ public class FloatElement extends AnElement {
   {
       return myData[x+Sizes[0]*y+SizeXY*z]*ScaleV+OffsetV;
   }
-  
- void ConvertSliceFromSimilar(int myslice, int bufslice, Object Ibuffer, int mstep, int moff) {
+
+  String GetValueStringAt(int x, int y, int z)   // Prints the value onto the screen. Can be overwritten
+    {
+        String ff="%g";
+        return String.format(ff,GetValueAt(x,y,z));
+    }
+
+    void ConvertSliceFromSimilar(int myslice, int bufslice, Object Ibuffer, int mstep, int moff) {
     // System.out.println("Byte Converting "+SizeXY+"\n");
     float [] mbuffer = (float []) Ibuffer;
     for (int i=0;i<SizeXY;i+=mstep)

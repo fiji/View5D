@@ -23,7 +23,7 @@ package view5d;
 
 
 // import java.io.*;
-import java.awt.TextArea;
+import java.awt.*;
 
 public class ImageErr extends TextArea {
     static final long serialVersionUID = 1;

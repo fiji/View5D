@@ -23,7 +23,7 @@
 package view5d;
 
 // import java.io.*;
-import java.awt.TextField;
+import java.awt.*;
 
 class TaggedText extends TaggedComponent {  // this is a component with a tag, capable of generating a part of a call
 	static final long serialVersionUID = 1;

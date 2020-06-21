@@ -23,7 +23,7 @@ package view5d;
 
 
 // import java.io.*;
-import java.util.Vector;
+import java.util.*;
 
 // A RIO class based on separating planes (in 3D, any orientation)
 class PlaneROI extends ROI {

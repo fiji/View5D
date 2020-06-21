@@ -24,12 +24,9 @@
 // import java.awt.image.ColorModel.*;
 package view5d;
 
-import java.awt.Component;
-import java.awt.Container;
+import java.awt.event.*;
 // import java.awt.color.*;
-import java.awt.Frame;
-import java.awt.GridLayout;
-import java.awt.event.WindowListener;
+import java.awt.*;
 
 public class AlternateViewer extends Frame implements WindowListener {
  static final long serialVersionUID = 1;
@@ -42,7 +39,7 @@ public class AlternateViewer extends Frame implements WindowListener {
     if (myapplet != null)
         setSize(myapplet.getBounds().width,myapplet.getBounds().height);
     else
-        setSize(200,200);
+        setSize(500,500);
     setVisible(true);
     addWindowListener(this); // register this class for handling the events in it
     }

@@ -94,6 +94,20 @@ public class ComplexElement extends AnElement {
    }
   }
 
+  String GetReadModeString() {
+      switch(readmode)
+      {
+          case 0:
+              return "Abs. Value.";
+          case 1:
+              return "Phase [deg.]";
+          case 2:
+              return "Real Part";
+          default:
+              return "Imag. Part";
+      }
+  }
+
   double GetValueAt(int x, int y, int z)
   {
       return GetRawValueAt(x,y,z)*ScaleV+OffsetV;
@@ -101,9 +115,10 @@ public class ComplexElement extends AnElement {
     
   String GetValueStringAt(int x, int y, int z)   // Prints the value onto the screen. Can be overwritten
      {
-  	float re=myData[2*(x+Sizes[0]*y+SizeXY*z)];
-  	float im=myData[2*(x+Sizes[0]*y+SizeXY*z)+1];
-      return nf.format(GetValueAt(x,y,z))+" ("+nf.format(re)+", "+nf.format(im)+"i)";
+  	  float re=myData[2*(x+Sizes[0]*y+SizeXY*z)];
+  	  float im=myData[2*(x+Sizes[0]*y+SizeXY*z)+1];
+  	  String ff="%g";
+      return String.format(ff,GetValueAt(x,y,z))+" ("+String.format(ff,re)+", "+String.format(ff,im)+"i)"+", "+GetReadModeString()+". "+String.format(ff,GetRawValueAt(x,y,z));
      }
   
  void ConvertSliceFromSimilar(int myslice, int bufslice, Object Ibuffer, int mstep, int moff) {   // set only the real value

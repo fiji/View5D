@@ -23,13 +23,10 @@
 // import java.io.*;
 package view5d;
 
-import ij.ImagePlus;
-import ij.gui.NewImage;
-
-import java.awt.Container;
-import java.awt.Image;
-import java.awt.image.ColorModel;
-import java.awt.image.MemoryImageSource;
+import java.awt.image.*;
+import java.awt.*;
+import ij.*;
+import ij.gui.*;
 
 class ASlice extends Object {
     int [] mySlice;     // int-slices for image display (can also be used for color display

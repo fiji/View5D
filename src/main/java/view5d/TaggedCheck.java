@@ -23,7 +23,7 @@ package view5d;
 
 
 // import java.io.*;
-import java.awt.Checkbox;
+import java.awt.*;
 
 class TaggedCheck extends TaggedComponent {  // this is a component with a tag, capable of generating a part of a call
     static final long serialVersionUID = 1;

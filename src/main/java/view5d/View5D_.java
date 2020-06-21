@@ -21,27 +21,19 @@
 // By making the appropriate class "View5D" or "View5D_" public and renaming the file, this code can be toggled between Applet and ImageJ respectively
 package view5d;
 
-import ij.IJ;
-import ij.ImagePlus;
-import ij.ImageStack;
-import ij.LookUpTable;
-import ij.WindowManager;
-import ij.gui.GUI;
-import ij.plugin.PlugIn;
+import java.awt.event.*;
+import java.awt.*;
+import java.util.*;
+import java.text.*;
 import ij.plugin.frame.PlugInFrame;
-import ij.process.ImageProcessor;
-
-import java.awt.BorderLayout;
-import java.awt.MenuBar;
-import java.awt.TextArea;
-import java.awt.event.WindowListener;
-import java.text.NumberFormat;
-import java.util.Locale;
-import java.util.Vector;
+import ij.*;
+import ij.plugin.*;
+import ij.process.*;
+import ij.gui.*;
 
 /* The code below is necessary to include the software as a plugin into ImageJ */
 public class View5D_ extends PlugInFrame implements PlugIn, WindowListener {
-    public static final long serialVersionUID = 1;
+    public static final long serialVersionUID = 2;
     public static final long serialSubVersionUID = 3;
     public static final long serialSubSubVersionUID = 0;
 	// Panel panel;
@@ -183,7 +175,7 @@ public class View5D_ extends PlugInFrame implements PlugIn, WindowListener {
      	case ImagePlus.COLOR_256: DataType=AnElement.ByteType;NumBytes=1;NumBits=8;break;    // 8-bit RGB with lookup
      	case ImagePlus.COLOR_RGB: DataType=AnElement.ByteType;NumBytes=1;NumBits=8;Elements=3; break;    // 24-bit RGB 
      	case ImagePlus.GRAY8: DataType=AnElement.ByteType;NumBytes=1;NumBits=8;break;    // 8-bit grayscale
-     	case ImagePlus.GRAY16: DataType=AnElement.ShortType;NumBytes=2;NumBits=16;break;    // 16-bit grayscale
+     	case ImagePlus.GRAY16: DataType=AnElement.UnsignedShortType;NumBytes=2;NumBits=16;break;    // 16-bit grayscale
      	case ImagePlus.GRAY32: DataType=AnElement.FloatType;NumBytes=4;NumBits=32;break;    // float image
      	}
 
@@ -300,14 +292,16 @@ public class View5D_ extends PlugInFrame implements PlugIn, WindowListener {
                     }
                 }
                 if ((data3d.Elements > 1 && data3d.Elements < 5) || redEl >= 0)
-		{
+		        {
+                    data3d.elementsLinked=false;
                     data3d.ToggleColor(true);  // switch to Color
-		}
+		        }
                 else
                 {
+                    data3d.elementsLinked=true;
                     data3d.ToggleColor(false);  // switch to BW
                 }
-                data3d.AdjustThresh(true); // .initThresh();
+                data3d.AdjustThresh(); // .initThresh();
                 
                 //System.out.println("Check2\n");
 		if (data3d.HistoY<0 && data3d.Elements > 1)
@@ -427,7 +421,7 @@ public class View5D_ extends PlugInFrame implements PlugIn, WindowListener {
 	
     void showAbout() {
               IJ.showMessage("About View5D, Version V"+serialVersionUID+"."+serialSubVersionUID+"."+serialSubSubVersionUID,
-	      " 5D-Viewer by Rainer Heintzmann\nUniversity of Jena, Jena, Germany\n"+
+	      " 5D-Viewer by Rainer Heintzmann\nUniversity of Jena, Jena, Germany and Leibniz Institute of PHotonics Technology, Germany\n"+
               "heintzmann@googlemail.com\n"+
               "http://www.nanoimaging.de/View5D/\n"+
 	      "use mouse click for changing slices, \ndrag images, zoom by typing 'A' and 'a'\n"+

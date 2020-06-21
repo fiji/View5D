@@ -23,20 +23,21 @@
 package view5d;
 
 import java.applet.Applet;
-import java.awt.BorderLayout;
-import java.awt.TextArea;
-import java.util.Vector;
+import java.awt.*;
+import java.util.*;
+import java.awt.event.*;
 // import view5d.*;
 
 // insert : "public" before this to make it an applet
 public class View5D extends Applet {
   static final long serialVersionUID = 1;  // Just to fulfil the requirement. Is not used. Look at View5D_.java
-  public int SizeX=0,SizeY=0,SizeZ=0;
-  int Elements=1,Times=1,defaultColor0=-1,
+  public int SizeX=0,SizeY=0,SizeZ=0,Elements=1,Times=1;
+  int defaultColor0=-1,
       redEl=-1,greenEl=-1,blueEl=-1;
-  My3DData data3d;
+  My3DData data3d=null;
   TextArea myLabel;
   ImgPanel mypan=null;
+  AlternateViewer aviewer;  // to keep track of the viewer instance
   Vector<ImgPanel> panels=new Vector<ImgPanel>();  // Keeps track of all the views. Sometimes this information is needed to send the updates.
   
   public String filename=null;
@@ -57,11 +58,12 @@ public class View5D extends Applet {
                                  ((ByteElement) data3d.ElementAt(ne,t)).myData, 0 , SizeX*SizeY*SizeZ);
 		}
 	data3d.GetBundleAt(ne).ToggleOverlayDispl(1);
+        Elements = data3d.GetNumElements();Times = data3d.GetNumTimes();
         return this;
    }
    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
    public View5D AddElement(short [] myarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
-        int DataType=AnElement.ShortType, NumBytes=1, NumBits=8;
+        int DataType=AnElement.ShortType, NumBytes=2, NumBits=16;
         int ne=data3d.GenerateNewElement(DataType,NumBytes,NumBits,data3d.GetScale(data3d.ActiveElement),
                             data3d.GetOffset(data3d.ActiveElement),1.0,0.0,data3d.GetAxisNames(),data3d.GetAxisUnits());
         for (int t=0;t<Times;t++) {
@@ -69,11 +71,25 @@ public class View5D extends Applet {
                                  ((ShortElement) data3d.ElementAt(ne,t)).myData, 0 , SizeX*SizeY*SizeZ);
 		}
 	data3d.GetBundleAt(ne).ToggleOverlayDispl(1);
+       Elements = data3d.GetNumElements();Times = data3d.GetNumTimes();
         return this;
    }
+    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
+    public View5D AddElement(char [] myarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+        int DataType=AnElement.UnsignedShortType, NumBytes=1, NumBits=8;
+        int ne=data3d.GenerateNewElement(DataType,NumBytes,NumBits,data3d.GetScale(data3d.ActiveElement),
+                data3d.GetOffset(data3d.ActiveElement),1.0,0.0,data3d.GetAxisNames(),data3d.GetAxisUnits());
+        for (int t=0;t<Times;t++) {
+            System.arraycopy( myarray, t*SizeX*SizeY*SizeZ,
+                    ((UnsignedShortElement) data3d.ElementAt(ne,t)).myData, 0 , SizeX*SizeY*SizeZ);
+        }
+        data3d.GetBundleAt(ne).ToggleOverlayDispl(1);
+        Elements = data3d.GetNumElements();Times = data3d.GetNumTimes();
+        return this;
+    }
    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
    public View5D AddElement(float [] myarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
-        int DataType=AnElement.FloatType, NumBytes=1, NumBits=8;
+        int DataType=AnElement.FloatType, NumBytes=4, NumBits=32;
         int ne=data3d.GenerateNewElement(DataType,NumBytes,NumBits,data3d.GetScale(data3d.ActiveElement),
                             data3d.GetOffset(data3d.ActiveElement),1.0,0.0,data3d.GetAxisNames(),data3d.GetAxisUnits());
         for (int t=0;t<Times;t++) {
@@ -81,11 +97,12 @@ public class View5D extends Applet {
                                  ((FloatElement) data3d.ElementAt(ne,t)).myData, 0 , SizeX*SizeY*SizeZ);
 		}
 	data3d.GetBundleAt(ne).ToggleOverlayDispl(1);
+       Elements = data3d.GetNumElements();Times = data3d.GetNumTimes();
         return this;
    }
    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
    public View5D AddElement(double [] myarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
-        int DataType=AnElement.DoubleType, NumBytes=1, NumBits=8;
+        int DataType=AnElement.DoubleType, NumBytes=8, NumBits=64;
         int ne=data3d.GenerateNewElement(DataType,NumBytes,NumBits,data3d.GetScale(data3d.ActiveElement),
                             data3d.GetOffset(data3d.ActiveElement),1.0,0.0,data3d.GetAxisNames(),data3d.GetAxisUnits());
         for (int t=0;t<Times;t++) {
@@ -93,6 +110,7 @@ public class View5D extends Applet {
                                  ((DoubleElement) data3d.ElementAt(ne,t)).myData, 0 , SizeX*SizeY*SizeZ);
 		}
 	data3d.GetBundleAt(ne).ToggleOverlayDispl(1);
+       Elements = data3d.GetNumElements();Times = data3d.GetNumTimes();
         return this;
    } 
 
@@ -106,21 +124,111 @@ public class View5D extends Applet {
                                  ((ComplexElement) data3d.ElementAt(ne,t)).myData, 0 , 2*SizeX*SizeY*SizeZ);
 		}
 	data3d.GetBundleAt(ne).ToggleOverlayDispl(1);
+       Elements = data3d.GetNumElements();Times = data3d.GetNumTimes();
         return this;
-   } 
+   }
 
-  /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
-   public static View5D Start5DViewer(byte [] barray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
+    public View5D AddTime(byte [] myarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
         int DataType=AnElement.ByteType, NumBytes=1, NumBits=8;
+        int nt=data3d.GenerateNewTime(DataType,NumBytes,NumBits,data3d.GetScale(data3d.ActiveElement),
+                data3d.GetOffset(data3d.ActiveElement),1.0,0.0,data3d.GetAxisNames(),data3d.GetAxisUnits());
+        for (int e=0;e<Elements;e++) {
+            System.arraycopy( myarray, e*SizeX*SizeY*SizeZ,
+                    ((ByteElement) data3d.ElementAt(e,nt)).myData, 0 , SizeX*SizeY*SizeZ);
+        }
+        mypan.CheckScrollBar();
+        if (aviewer != null)
+            ((ImgPanel) aviewer.mycomponent).CheckScrollBar();
+        return this;
+    }
+    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
+    public View5D AddTime(short [] myarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+        int DataType=AnElement.ShortType, NumBytes=2, NumBits=16;
+        int nt=data3d.GenerateNewTime(DataType,NumBytes,NumBits,data3d.GetScale(data3d.ActiveElement),
+                data3d.GetOffset(data3d.ActiveElement),1.0,0.0,data3d.GetAxisNames(),data3d.GetAxisUnits());
+        for (int e=0;e<Elements;e++) {
+            System.arraycopy( myarray, e*SizeX*SizeY*SizeZ,
+                    ((ShortElement) data3d.ElementAt(e,nt)).myData, 0 , SizeX*SizeY*SizeZ);
+        }
+        mypan.CheckScrollBar();
+        if (aviewer != null)
+            ((ImgPanel) aviewer.mycomponent).CheckScrollBar();
+        return this;
+    }
+    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
+    public View5D AddTime(char [] myarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+        int DataType=AnElement.UnsignedShortType, NumBytes=1, NumBits=8;
+        int nt=data3d.GenerateNewTime(DataType,NumBytes,NumBits,data3d.GetScale(data3d.ActiveElement),
+                data3d.GetOffset(data3d.ActiveElement),1.0,0.0,data3d.GetAxisNames(),data3d.GetAxisUnits());
+        for (int e=0;e<Elements;e++) {
+            System.arraycopy( myarray, e*SizeX*SizeY*SizeZ,
+                    ((UnsignedShortElement) data3d.ElementAt(e,nt)).myData, 0 , SizeX*SizeY*SizeZ);
+        }
+        mypan.CheckScrollBar();
+        if (aviewer != null)
+            ((ImgPanel) aviewer.mycomponent).CheckScrollBar();
+        return this;
+    }
+    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
+    public View5D AddTime(float [] myarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+        int DataType=AnElement.FloatType, NumBytes=4, NumBits=32;
+        int nt=data3d.GenerateNewTime(DataType,NumBytes,NumBits,data3d.GetScale(data3d.ActiveElement),
+                data3d.GetOffset(data3d.ActiveElement),1.0,0.0,data3d.GetAxisNames(),data3d.GetAxisUnits());
+        for (int e=0;e<Elements;e++) {
+            System.arraycopy( myarray, e*SizeX*SizeY*SizeZ,
+                    ((FloatElement) data3d.ElementAt(e,nt)).myData, 0 , SizeX*SizeY*SizeZ);
+        }
+        mypan.CheckScrollBar();
+        if (aviewer != null)
+            ((ImgPanel) aviewer.mycomponent).CheckScrollBar();
+        return this;
+    }
+    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
+    public View5D AddTime(double [] myarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+        int DataType=AnElement.DoubleType, NumBytes=8, NumBits=64;
+        int nt=data3d.GenerateNewTime(DataType,NumBytes,NumBits,data3d.GetScale(data3d.ActiveElement),
+                data3d.GetOffset(data3d.ActiveElement),1.0,0.0,data3d.GetAxisNames(),data3d.GetAxisUnits());
+        for (int e=0;e<Elements;e++) {
+            System.arraycopy( myarray, e*SizeX*SizeY*SizeZ,
+                    ((DoubleElement) data3d.ElementAt(e,nt)).myData, 0 , SizeX*SizeY*SizeZ);
+        }
+        mypan.CheckScrollBar();
+        if (aviewer != null)
+            ((ImgPanel) aviewer.mycomponent).CheckScrollBar();
+        return this;
+    }
+
+    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
+    public View5D AddTimeC(float [] myarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+        int DataType=AnElement.ComplexType, NumBytes=8, NumBits=64;
+        int nt=data3d.GenerateNewElement(DataType,NumBytes,NumBits,data3d.GetScale(data3d.ActiveElement),
+                data3d.GetOffset(data3d.ActiveElement),1.0,0.0,data3d.GetAxisNames(),data3d.GetAxisUnits());
+        for (int e=0;e<Elements;e++) {
+            System.arraycopy( myarray, 2*e*SizeX*SizeY*SizeZ,
+                    ((ComplexElement) data3d.ElementAt(e,nt)).myData, 0 , 2*SizeX*SizeY*SizeZ);
+        }
+        mypan.CheckScrollBar();
+        if (aviewer != null)
+            ((ImgPanel) aviewer.mycomponent).CheckScrollBar();
+        return this;
+    }
+
+
+    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
+   public static View5D Start5DViewer(byte [] barray, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
+        int DataType=AnElement.ByteType, NumBytes=1, NumBits=8;
+        // System.out.println("Parameters ARE: " + SizeX+", "+SizeX+", "+SizeZ+", "+Elements+", "+Times+", "+AX+", "+AY);
         View5D anApplet=Prepare5DViewer(SizeX,SizeY,SizeZ,Elements,Times,DataType,NumBytes,NumBits);
         ((ByteElement) anApplet.data3d.ActElement()).myData= barray; // new byte[SizeX*SizeY*SizeZ];
-	anApplet.data3d.ToggleOverlayDispl(1);
-        AlternateViewer aviewer=new AlternateViewer(anApplet,600,500);
+	    anApplet.data3d.ToggleOverlayDispl(1);
+        anApplet.aviewer=new AlternateViewer(anApplet,AX,AY);
         for (int t=0;t<Times;t++)
             for (int e=0;e<Elements;e++)
             {
+                // System.out.println("Debug t:" + t+", e:"+e);
                 if (e==0 && t ==0)
-                    aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
+                    anApplet.aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
                 else
                     System.arraycopy( barray, (e+Elements*t)*SizeX*SizeY*SizeZ,
                                  ((ByteElement) anApplet.data3d.ElementAt(e,t)).myData, 0 , SizeX*SizeY*SizeZ);
@@ -129,19 +237,152 @@ public class View5D extends Applet {
         return anApplet;
    }
 
-   /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
-   public static View5D Start5DViewer(short [] sarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+    //public void hide() {
+    //    aviewer.setVisible(false); // hide it
+    //    // aviewer.dispose();
+    //}
+
+    public void toFront() {
+        data3d.InvalidateSlices();
+        //java.awt.EventQueue.invokeLater(new Runnable() {
+        //    @Override
+        //    public void run() {
+        //        aviewer.toFront();
+        //        aviewer.repaint();
+        //    }
+        //});
+        if (aviewer.getState() != Frame.NORMAL) { aviewer.setState(Frame.NORMAL); }
+        aviewer.setVisible(true);
+        aviewer.toFront();
+        aviewer.repaint();
+    }
+
+    public void closeAll() {
+       this.dispatchEvent(new WindowEvent(aviewer, WindowEvent.WINDOW_CLOSING));
+       aviewer.dispose();
+       this.stop();
+       this.destroy();
+    }
+
+    public void SetElementsLinked(boolean doLink) {
+       data3d.setElementsLinked(doLink);
+    }
+
+    public void setTimesLinked(boolean doLink) {
+        data3d.setTimesLinked(doLink);
+    }
+
+    public void SetGamma(int e, double gamma) {
+        data3d.SetGamma(e,gamma);
+    }
+
+    /* Just an alias to call the overloaded methods from Python using pyjnius */
+    public static View5D Start5DViewerB(byte [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, AX, AY);
+    }
+    /* Just an alias for backward compatibility calling without viewer sizes */
+    public static View5D Start5DViewer(byte [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, 600,600);
+    }
+
+    public static View5D Start5DViewerB(byte [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times) { // This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, 600,600); // This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+    }
+
+    public void setSize(int width, int height) {
+        aviewer.setSize(width,height);
+    }
+
+    public void ReplaceData(int e, int t, byte [] anarray) {
+        int [] sizes = data3d.sizes; int tsize = sizes[0]*sizes[1]*sizes[2];
+        System.arraycopy(anarray, 0, ((ByteElement) data3d.ElementAt(e,t)).myData, 0 , tsize);
+    }
+    public void ReplaceDataB(int e, int t, byte [] anarray) {
+        int [] sizes = data3d.sizes; int tsize = sizes[0]*sizes[1]*sizes[2];
+        System.arraycopy(anarray, 0, ((ByteElement) data3d.ElementAt(e,t)).myData, 0 , tsize);
+    }
+    public void ReplaceData(int e, int t, double [] anarray) {
+        int [] sizes = data3d.sizes; int tsize = sizes[0]*sizes[1]*sizes[2];
+        System.arraycopy(anarray, 0, ((DoubleElement) data3d.ElementAt(e,t)).myData, 0 , tsize);
+    }
+    public void ReplaceDataD(int e, int t, double [] anarray) {
+        int [] sizes = data3d.sizes; int tsize = sizes[0]*sizes[1]*sizes[2];
+        System.arraycopy(anarray, 0, ((DoubleElement) data3d.ElementAt(e,t)).myData, 0 , tsize);
+    }
+    public void ReplaceData(int e, int t, float [] anarray) {
+        int [] sizes = data3d.sizes; int tsize = sizes[0]*sizes[1]*sizes[2];
+        System.arraycopy(anarray, 0, ((FloatElement) data3d.ElementAt(e,t)).myData, 0 , tsize);
+    }
+    public void ReplaceDataF(int e, int t, float [] anarray) {
+        int [] sizes = data3d.sizes; int tsize = sizes[0]*sizes[1]*sizes[2];
+        System.arraycopy(anarray, 0, ((FloatElement) data3d.ElementAt(e,t)).myData, 0 , tsize);
+    }
+    public void ReplaceData(int e, int t, int [] anarray) {
+        int [] sizes = data3d.sizes; int tsize = sizes[0]*sizes[1]*sizes[2];
+        System.arraycopy(anarray, 0, ((IntegerElement) data3d.ElementAt(e,t)).myData, 0 , tsize);
+    }
+    public void ReplaceDataI(int e, int t, int [] anarray) {
+        int [] sizes = data3d.sizes; int tsize = sizes[0]*sizes[1]*sizes[2];
+        System.arraycopy(anarray, 0, ((IntegerElement) data3d.ElementAt(e,t)).myData, 0 , tsize);
+    }
+    public void ReplaceData(int e, int t, char [] anarray) {
+        int [] sizes = data3d.sizes; int tsize = sizes[0]*sizes[1]*sizes[2];
+        System.arraycopy(anarray, 0, ((UnsignedShortElement) data3d.ElementAt(e,t)).myData, 0 , tsize);
+    }
+    public void ReplaceDataUS(int e, int t, char [] anarray) {
+        int [] sizes = data3d.sizes; int tsize = sizes[0]*sizes[1]*sizes[2];
+        System.arraycopy(anarray, 0, ((UnsignedShortElement) data3d.ElementAt(e,t)).myData, 0 , tsize);
+    }
+    public void ReplaceDataC(int e, int t, float [] anarray) {
+        int [] sizes = data3d.sizes; int tsize = 2*sizes[0]*sizes[1]*sizes[2];
+        System.arraycopy(anarray, 0, ((ComplexElement) data3d.ElementAt(e,t)).myData, 0 , tsize);
+    }
+    public int getNumElements() {
+        return data3d.GetNumElements();
+    }
+    public int getNumTime() {
+        return data3d.GetNumTimes();
+    }
+    public static View5D Dummy(byte[] sarray, int SizeX, int SizeY, int SizeZ, int Elements,int Times) { // int AX, int AY
+        int DataType=AnElement.ByteType, NumBytes=1, NumBits=8;
+        View5D anApplet=Prepare5DViewer(SizeX,SizeY,SizeZ,1,1,DataType,NumBytes,NumBits);
+        sarray[0]=0;
+        ((ByteElement) anApplet.data3d.ActElement()).myData= sarray; // new byte[SizeX*SizeY*SizeZ];
+        anApplet.data3d.ToggleOverlayDispl(1);
+        anApplet.aviewer=new AlternateViewer(anApplet,600,600);
+        for (int t=0;t<Times;t++)
+            for (int e=0;e<Elements;e++)
+            {
+                // System.out.println("Debug t:" + t+", e:"+e);
+                if (e==0 && t ==0)
+                    anApplet.aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
+                else
+                    System.arraycopy(sarray, (e+Elements*t)*SizeX*SizeY*SizeZ,
+                            ((ByteElement) anApplet.data3d.ElementAt(e,t)).myData, 0 , SizeX*SizeY*SizeZ);
+            }
+
+        anApplet.start();
+        // System.out.println("Parameters ARE: " + SizeX+", "+SizeX+", "+SizeZ+", "+Elements+", "+Times);
+        return anApplet;
+    }
+
+    public static int DummyI(int sss) {
+        return 44;
+    }
+
+    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
+   public static View5D Start5DViewer(short [] sarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
         int DataType=AnElement.ShortType, NumBytes=2, NumBits=8;
         System.out.println("viewer invoked (short datatype)");
         View5D anApplet=Prepare5DViewer(SizeX,SizeY,SizeZ,Elements,Times,DataType,NumBytes,NumBits);
         ((ShortElement) anApplet.data3d.ActElement()).myData= sarray; // new byte[SizeX*SizeY*SizeZ];
-	anApplet.data3d.ToggleOverlayDispl(1);
-        AlternateViewer aviewer=new AlternateViewer(anApplet,600,500);
+   	    anApplet.data3d.ToggleOverlayDispl(1);
+        anApplet.aviewer=new AlternateViewer(anApplet,AX,AY);
         for (int t=0;t<Times;t++)
             for (int e=0;e<Elements;e++)
             {
                 if (e==0 && t ==0)
-                    aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
+                    anApplet.aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
                 else
                     System.arraycopy(sarray, (e+Elements*t)*SizeX*SizeY*SizeZ,
                                  ((ShortElement) anApplet.data3d.ElementAt(e,t)).myData, 0 , SizeX*SizeY*SizeZ);
@@ -150,72 +391,146 @@ public class View5D extends Applet {
         return anApplet;
    }
 
-   /* The code below is necessary to include the software as a plugin into Mathlab and DipImage (Univ. Delft) */
-   public static View5D Start5DViewer(float [] farray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+    /* Just an alias to call the overloaded methods from Python using pyjnius */
+    public static View5D Start5DViewerS(short [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, AX, AY);
+    }
+    public static View5D Start5DViewerS(short [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {// This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, 600,600);// This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+    }
+    /* Just an alias for backward compatibility calling without viewer sizes */
+    public static View5D Start5DViewer(short [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, 600,600);
+    }
+
+    /* The code below is necessary to include the software as a plugin into Matlab and DipImage (Univ. Delft) */
+    public static View5D Start5DViewer(char [] sarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
+        int DataType=AnElement.UnsignedShortType, NumBytes=2, NumBits=16;
+        System.out.println("viewer invoked (unsigned short datatype)");
+        View5D anApplet=Prepare5DViewer(SizeX,SizeY,SizeZ,Elements,Times,DataType,NumBytes,NumBits);
+        ((UnsignedShortElement) anApplet.data3d.ActElement()).myData= sarray; // new byte[SizeX*SizeY*SizeZ];
+        anApplet.data3d.ToggleOverlayDispl(1);
+        anApplet.aviewer=new AlternateViewer(anApplet,AX,AY);
+        for (int t=0;t<Times;t++)
+            for (int e=0;e<Elements;e++)
+            {
+                if (e==0 && t ==0)
+                    anApplet.aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
+                else
+                    System.arraycopy(sarray, (e+Elements*t)*SizeX*SizeY*SizeZ,
+                            ((UnsignedShortElement) anApplet.data3d.ElementAt(e,t)).myData, 0 , SizeX*SizeY*SizeZ);
+            }
+        anApplet.start();
+        return anApplet;
+    }
+
+    /* Just an alias to call the overloaded methods from Python using pyjnius or javabridge*/
+    public static View5D Start5DViewerUS(char [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times,AY,AX);
+    }
+    public static View5D Start5DViewerUS(char [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {// This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times,600,600);// This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+    }
+    /* Just an alias for backward compatibility calling without viewer sizes */
+    public static View5D Start5DViewer(char [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, 600,600);
+    }
+
+    /* The code below is necessary to include the software as a plugin into Mathlab and DipImage (Univ. Delft) */
+   public static View5D Start5DViewer(float [] farray, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
         int DataType=AnElement.FloatType, NumBytes=4, NumBits=32;
         View5D anApplet=Prepare5DViewer(SizeX,SizeY,SizeZ,Elements,Times,DataType,NumBytes,NumBits);
         ((FloatElement) anApplet.data3d.ActElement()).myData= farray; // new byte[SizeX*SizeY*SizeZ];
 	anApplet.data3d.ToggleOverlayDispl(1);
-        AlternateViewer aviewer=new AlternateViewer(anApplet,600,500);
+       anApplet.aviewer=new AlternateViewer(anApplet,AX,AY);
         for (int t=0;t<Times;t++)
             for (int e=0;e<Elements;e++)
                 if (e==0 && t ==0)
-                    aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
+                    anApplet.aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
                 else     
                     System.arraycopy( farray, (e+Elements*t)*SizeX*SizeY*SizeZ,
                                  ((FloatElement) anApplet.data3d.ElementAt(e,t)).myData, 0 , SizeX*SizeY*SizeZ);
         anApplet.start();
         return anApplet;
    }
-   /* Complex is not a known class in java, therefore a separate */
-   public static View5D Start5DViewerC(float [] carray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+
+    /* Just an alias to call the overloaded methods from Python using pyjnius */
+    public static View5D Start5DViewerF(float [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, AX, AY);
+    }
+    public static View5D Start5DViewerF(float [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {// This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, 600,600);// This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+    }
+    /* Just an alias for backward compatibility calling without viewer sizes */
+    public static View5D Start5DViewer(float [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, 600,600);
+    }
+
+    /* Complex is not a known class in java, therefore a separate */
+   public static View5D Start5DViewerC(float [] carray, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
         int DataType=AnElement.ComplexType, NumBytes=8, NumBits=64;
 	// SizeX=SizeX/2;
         View5D anApplet=Prepare5DViewer(SizeX,SizeY,SizeZ,Elements,Times,DataType,NumBytes,NumBits);
         ((ComplexElement) anApplet.data3d.ActElement()).myData= carray; // new byte[SizeX*SizeY*SizeZ];
 	anApplet.data3d.ToggleOverlayDispl(1);
-        AlternateViewer aviewer=new AlternateViewer(anApplet,600,500);
+       anApplet.aviewer=new AlternateViewer(anApplet,AX,AY);
         for (int t=0;t<Times;t++)
             for (int e=0;e<Elements;e++)
                 if (e==0 && t ==0)
-                    aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
+                    anApplet.aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
                 else
                     System.arraycopy(carray, 2*(e+Elements*t)*SizeX*SizeY*SizeZ,
                                  ((ComplexElement) anApplet.data3d.ElementAt(e,t)).myData, 0 , 2*SizeX*SizeY*SizeZ);
         anApplet.start();
         return anApplet;
    }
+    public static View5D Start5DViewerC(float [] carray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) { // This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+        return Start5DViewerC(carray, SizeX, SizeY, SizeZ,Elements,Times, 600, 600); // This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+    }
 
    /* The code below is necessary to include the software as a plugin into Mathlab and DipImage (Univ. Delft) */
-   public static View5D Start5DViewer(double [] farray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+   public static View5D Start5DViewer(double [] farray, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
         int DataType=AnElement.DoubleType, NumBytes=8, NumBits=64;
         View5D anApplet=Prepare5DViewer(SizeX,SizeY,SizeZ,Elements,Times,DataType,NumBytes,NumBits);
         ((DoubleElement) anApplet.data3d.ActElement()).myData= farray; // new byte[SizeX*SizeY*SizeZ];
-	anApplet.data3d.ToggleOverlayDispl(1);
-        AlternateViewer aviewer=new AlternateViewer(anApplet,600,500);
+	    anApplet.data3d.ToggleOverlayDispl(1);
+        anApplet.aviewer=new AlternateViewer(anApplet,AX,AY);
         for (int t=0;t<Times;t++)
             for (int e=0;e<Elements;e++)
                 if (e==0 && t ==0)
-                    aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
+                    anApplet.aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
                 else     
                     System.arraycopy( farray, (e+Elements*t)*SizeX*SizeY*SizeZ,
                                  ((DoubleElement) anApplet.data3d.ElementAt(e,t)).myData, 0 , SizeX*SizeY*SizeZ);
         anApplet.start();
         return anApplet;
    }
-   
-   /* The code below is necessary to include the software as a plugin into Mathlab and DipImage (Univ. Delft) */
-   public static View5D Start5DViewer(int [] iarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+
+    /* Just an alias to call the overloaded methods from Python using pyjnius */
+    public static View5D Start5DViewerD(double [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, AX, AY);
+    }
+    public static View5D Start5DViewerD(double [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {// This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, 600,600);// This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+    }
+    /* Just an alias for backward compatibility calling without viewer sizes */
+    public static View5D Start5DViewer(double [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, 600,600);
+    }
+
+
+    /* The code below is necessary to include the software as a plugin into Mathlab and DipImage (Univ. Delft) */
+   public static View5D Start5DViewer(int [] iarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
         int DataType=AnElement.IntegerType, NumBytes=4, NumBits=32;
         System.out.println("viewer invoked (int datatype)");
         View5D anApplet=Prepare5DViewer(SizeX,SizeY,SizeZ,Elements,Times,DataType,NumBytes,NumBits);
         ((IntegerElement) anApplet.data3d.ActElement()).myData= iarray; // new byte[SizeX*SizeY*SizeZ];
 	anApplet.data3d.ToggleOverlayDispl(1);
-        AlternateViewer aviewer=new AlternateViewer(anApplet,600,500);
+       anApplet.aviewer=new AlternateViewer(anApplet,AX,AY);
         for (int t=0;t<Times;t++)
             for (int e=0;e<Elements;e++)
                 if (e==0 && t ==0)
-                    aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
+                    anApplet.aviewer.Assign3DData(anApplet,anApplet.mypan,anApplet.data3d);
                 else                        
                     System.arraycopy( iarray, (e+Elements*t)*SizeX*SizeY*SizeZ,
                                  ((IntegerElement) anApplet.data3d.ElementAt(e,t)).myData, 0 , SizeX*SizeY*SizeZ);
@@ -223,7 +538,20 @@ public class View5D extends Applet {
         return anApplet;
    }
 
-   /* The code below is necessary to include the software as a plugin into Mathlab and DipImage (Univ. Delft) */
+    /* Just an alias to call the overloaded methods from Python using pyjnius */
+    public static View5D Start5DViewerI(int [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times, int AX, int AY) {
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, AX, AY);
+    }
+    public static View5D Start5DViewerI(int [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {// This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, 600,600);// This is unfortunately NECESSARY due to a limited argument length of javabringe in Python
+    }
+    /* Just an alias for backward compatibility calling without viewer sizes */
+    public static View5D Start5DViewer(int [] array, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
+        return Start5DViewer(array,SizeX,SizeY,SizeZ,Elements,Times, 600,600);
+    }
+
+
+    /* The code below is necessary to include the software as a plugin into Mathlab and DipImage (Univ. Delft) */
    //public static View5D Start5DViewer(short [] sarray, int SizeX, int SizeY, int SizeZ,int Elements,int Times) {
    //     int [] iarray= new int[SizeX*SizeY*SizeZ*Times*Elements];
    //     for (int i=0;i<SizeX*SizeY*SizeZ*Times*Elements;i++)
@@ -243,7 +571,51 @@ public class View5D extends Applet {
 	   mypan.c1.UpdateAll();
    }
 
-   public String ExportMarkers()
+    public void NameElement(int elementNum, String Name) {
+       data3d.ElementAt(elementNum).NameV = Name;
+   }
+    public void setName(int elementNum, String Name) {
+        data3d.ElementAt(elementNum).NameV = Name;
+    }
+    public void setUnit(int elementNum, String Name) { data3d.ElementAt(elementNum).UnitV = Name; }
+    public void setOffsetScale(int elementNum, double offset, double scale) {
+        data3d.ElementAt(elementNum).OffsetV = offset;
+        data3d.ElementAt(elementNum).ScaleV = scale;
+    }
+    public void setMinMaxThresh(int elementNum, double MinVal, double MaxVal) {
+       data3d.SetThresh(elementNum,MinVal,MaxVal);
+    }
+
+    public void SetAxisScalesAndUnits(int elementNum, int timeNum, double SV, double SX,double SY,double SZ,double SE,double ST,double OV,double OX,double OY,double OZ,double OE,double OT,String NameV, String Names[],String UnitV, String Units[]) {
+        data3d.ElementAt(elementNum,timeNum).ScaleV = SV;
+        data3d.ElementAt(elementNum,timeNum).Scales[0] = SX;
+        data3d.ElementAt(elementNum,timeNum).Scales[1] = SY;
+        data3d.ElementAt(elementNum,timeNum).Scales[2] = SZ;
+        data3d.ElementAt(elementNum,timeNum).Scales[3] = SE;
+        data3d.ElementAt(elementNum,timeNum).Scales[4] = ST;
+        data3d.ElementAt(elementNum,timeNum).OffsetV = OV;
+        data3d.ElementAt(elementNum,timeNum).Offsets[0] = OX;
+        data3d.ElementAt(elementNum,timeNum).Offsets[1] = OY;
+        data3d.ElementAt(elementNum,timeNum).Offsets[2] = OZ;
+        data3d.ElementAt(elementNum,timeNum).Offsets[3] = OE;
+        data3d.ElementAt(elementNum,timeNum).Offsets[4] = OT;
+        data3d.ElementAt(elementNum,timeNum).Names = Names;
+        data3d.ElementAt(elementNum,timeNum).Units = Units;
+        data3d.ElementAt(elementNum,timeNum).NameV = NameV;
+        data3d.ElementAt(elementNum,timeNum).UnitV = UnitV;
+    }
+    public void SetAxisScalesAndUnits(double SV, double SX,double SY,double SZ,double SE,double ST,double OV,double OX,double OY,double OZ,double OE,double OT,String NameV, String Names[],String UnitV, String Units[]) {
+        for (int e = 0; e < data3d.Elements; e++) {
+            for (int t = 0; t < data3d.Times; t++)
+                SetAxisScalesAndUnits(e, t, SV, SX,SY,SZ,SE,ST,OV,OX,OY,OZ,OE,OT,NameV,Names,UnitV, Units);
+        }
+    }
+
+    public void NameWindow(String Name) {
+       aviewer.setTitle(Name);
+    }
+
+    public String ExportMarkers()
    {
        return data3d.MyMarkers.PrintList(data3d);
    }
@@ -257,7 +629,7 @@ public class View5D extends Applet {
    {
        return data3d.MyMarkers.ExportMarkers(list,data3d);
    }
-   
+
    // one of the function accesable from Matlab and Mathematica
    // The whole state of all lists and their connections is imported
    public void ImportMarkerLists(float [][] lists)  // all markers are just stored in one big matrix  
@@ -286,8 +658,11 @@ public class View5D extends Applet {
        data3d.InvalidateSlices();
        mypan.c1.UpdateAllNoCoord();
    }
-   
-   public static View5D Prepare5DViewer(int SizeX, int SizeY, int SizeZ, int Elements, int Times, int DataType, int NumBytes, int NumBits) {
+    public void setMarkerInitTrackDir(int TD,int SX,int SY,int SZ,boolean UC,int CX,int CY,int CZ) {
+        data3d.setMarkerInitTrackDir(TD,SX,SY,SZ,UC,CX,CY,CZ);
+    }
+
+    public static View5D Prepare5DViewer(int SizeX, int SizeY, int SizeZ, int Elements, int Times, int DataType, int NumBytes, int NumBits) {
 	// SizeX=100,SizeY=100,SizeZ=100,
         int   redEl=-1,greenEl=-1,blueEl=-1;
         double[] Scales = new double[5];
@@ -327,7 +702,7 @@ public class View5D extends Applet {
                                     Elements,Times,
                                     redEl,greenEl,blueEl,
                                     HistoX,HistoY,HistoZ,
-				    DataType,NumBytes,NumBits,
+                				     DataType,NumBytes,NumBits,
                                     Scales,Offsets,
                                     ScaleV, OffsetV, Names, Units);
         System.out.println("created data " + Elements);
@@ -344,16 +719,21 @@ public class View5D extends Applet {
         anApplet.greenEl = greenEl;
         anApplet.blueEl = blueEl;
         anApplet.initLayout(Times);
+        if (Elements <= 5)
+            data3d.elementsLinked=false;
+        else
+            data3d.elementsLinked=true;
         if ((Elements > 1 && Elements < 5) || redEl >= 0)
-		{
-                    data3d.ToggleColor(true);  // switch to Color
+    		{
+    		    data3d.ToggleColor(true);  // switch to Color
                     // data3d.AdjustThresh(true); // initThresh();
-		}
-                else
-                {
+	    	}
+	    	else
+	    	    {
                     data3d.ToggleColor(false);  // switch to BW
                     // data3d.AdjustThresh(true); // initThresh();
-                }                
+                }
+//       data3d.AdjustThreshFlexible(); // .initThresh();
         // System.out.println("Layout ready");
         // anApplet.mypan.setVisible(true);  // does not work ???
         // System.out.println("started");
@@ -433,7 +813,11 @@ public class View5D extends Applet {
 	System.out.println("Error: Unknown datatype: "+AType+"\n");
 	return -1;
   }
-      
+
+  public void setFontSize(int FontSize) {
+      data3d.setFontSize(FontSize);
+   }
+
   public void initLayout(int Times) {
                     // data3d.initGlobalThresh();
                     
@@ -453,7 +837,7 @@ public class View5D extends Applet {
   }
   
   public void init() {
-	 if (System.getProperty("java.version").compareTo("1.4") < 0)  // this viewer should work from version 1.1 on
+	 if (System.getProperty("java.version").compareTo("1.4") < 0)  // this viewer should work from version 1.4 on
 	     {
 	 	setLayout(new BorderLayout());
 	 	add("North", new ImageErr());
@@ -470,6 +854,10 @@ public class View5D extends Applet {
                 Times = ParseInt("times",false,1);
                 defaultColor0 = ParseInt("defcol0",false,-1);
                 Elements = ParseInt("elements",true,1);
+        if (Elements < 5)
+            data3d.elementsLinked=false;
+        else
+            data3d.elementsLinked=true;
 		if (Elements > 1)
 		{
                     redEl=0;
@@ -607,12 +995,16 @@ public class View5D extends Applet {
 			data3d.markerOutfilename = MyMarkerOut;
 
         initLayout(Times);
-                if ((Elements > 1 && Elements < 5) || redEl >= 0)
-		{
-                    data3d.ToggleColor(true);  // switch to Color
+        if (Elements < 5)
+            data3d.elementsLinked=false;
+        else
+            data3d.elementsLinked=true;
+        if ((Elements > 1 && Elements < 5) || redEl >= 0)
+		    {
+            data3d.ToggleColor(true);  // switch to Color
                     // data3d.AdjustThresh(true); // initThresh();
-		}
-                else
+		    }
+		    else
                 {
                     data3d.ToggleColor(false);  // switch to BW
                     // data3d.AdjustThresh(true); // initThresh();
@@ -621,7 +1013,7 @@ public class View5D extends Applet {
     }
 
     public void start() {
-		data3d.AdjustThresh(true); // initThresh();
+		data3d.AdjustThresh(); // initThresh();
 		mypan.InitScaling();
     }
 
