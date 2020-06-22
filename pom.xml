@@ -86,7 +86,7 @@
 	</issueManagement>
 	<ciManagement>
 		<system>Travis CI</system>
-		<url>https://travis-ci.org/fiji/View5D</url>
+		<url>https://travis-ci.com/fiji/View5D</url>
 	</ciManagement>
 
 	<properties>
