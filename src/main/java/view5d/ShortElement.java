@@ -51,7 +51,7 @@ public class ShortElement extends AnElement {
   void SetValueAt(int x, int y, int z, double val)
   {
       if (val < 0.0) val = 0.0;
-      if (val > 255) val = 255;
+      if (val > MaxValue-1) val = MaxValue-1;
       myData[x+Sizes[0]*y+SizeXY*z]= (short) val;
   }
   

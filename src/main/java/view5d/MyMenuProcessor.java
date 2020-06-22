@@ -23,14 +23,15 @@ package view5d;
 
 
 // import java.io.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 // Now the Action Listener processing all menu event by being associated to a characted
 class MyMenuProcessor implements ActionListener {
     ImageCanvas mycanvas;
     PixelDisplay mypix;
     My3DData data3d;
+    PositionLabel myPosL;
+
     boolean ColorMapSelector=false;
     char mykey;
     int mycolor=0;
@@ -40,6 +41,7 @@ class MyMenuProcessor implements ActionListener {
 	mycanvas=myp;
 	mypix=null;
 	data3d=null;
+	myPosL=null;
 	mykey=key;
     }
     public MyMenuProcessor(PixelDisplay myp,char key)
@@ -48,16 +50,28 @@ class MyMenuProcessor implements ActionListener {
 	mycanvas=null;
 	data3d=null;
 	mykey=key;
+	myPosL=null;
     }
+
     public MyMenuProcessor(PixelDisplay myp,ImageCanvas mypc, boolean inv, int colormap)
     {
 	data3d=myp.data3d;
 	mycanvas=mypc;
 	mypix=myp;
+	myPosL=null;
 	mycolor=colormap;
         inverse=inv;
     }
-    
+
+    public MyMenuProcessor(PositionLabel myl,char key)
+    {
+        myPosL=myl;
+        mypix=null;
+        mycanvas=null;
+        data3d=null;
+        mykey=key;
+    }
+
     public void  actionPerformed(ActionEvent e) 
     {
 	// System.out.println("Action: :"+e);
@@ -73,8 +87,9 @@ class MyMenuProcessor implements ActionListener {
         }
         else if (mycanvas != null)
             mycanvas.ProcessKey(mykey);
-        else
-        if (mypix != null)
+        else if (mypix != null)
             mypix.ProcessKey(mykey);
+        else if (myPosL != null)
+            myPosL.ProcessKey(mykey);
     }
 }

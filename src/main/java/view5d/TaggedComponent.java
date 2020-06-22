@@ -28,11 +28,7 @@ package view5d;
 // import java.awt.image.ColorModel.*;
 // import java.awt.color.*;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Label;
-import java.awt.Panel;
+import java.awt.*;
 
 // Tagged component classes, taken from my JFlow project and simplified
 class TaggedComponent extends Panel { // a general superclass if called with component==null it can be used as text 

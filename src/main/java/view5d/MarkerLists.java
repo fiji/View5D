@@ -23,13 +23,11 @@
 // import java.io.*;
 package view5d;
 
-import ij.IJ;
-import ij.gui.GenericDialog;
-
-import java.io.StreamTokenizer;
-import java.text.NumberFormat;
-import java.util.Locale;
-import java.util.Vector;
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import ij.*;
+import ij.gui.*;
 
 public class MarkerLists extends Object { // This class manages multiple lists of point markers
 	MarkerList MyActiveList = null;

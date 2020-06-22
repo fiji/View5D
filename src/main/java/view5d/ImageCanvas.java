@@ -23,33 +23,12 @@
 // import java.io.*;
 package view5d;
 
-import ij.gui.PlotWindow;  // for export of plotwindow
-
-import java.awt.Canvas;
-import java.awt.CheckboxMenuItem;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Event;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Menu;
-import java.awt.MenuItem;
-import java.awt.Polygon;
-import java.awt.PopupMenu;
-import java.awt.Rectangle;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.image.ImageObserver;
-import java.text.NumberFormat;
-import java.util.Locale;
-import java.util.Vector;
+import java.awt.image.*;
+import java.awt.event.*;
+import java.awt.*;
+import java.util.*;
+import java.text.*;
+import ij.gui.*;  // for export of plotwindow
 
 // a canvas represents one view of the data
 public class ImageCanvas extends Canvas implements ImageObserver,MouseListener,MouseMotionListener,KeyListener,FocusListener,AdjustmentListener {
@@ -278,7 +257,8 @@ private int  MaxPos=1;
     g.setColor(Color.black);
     g.fillRect(0,0,r.width-1,r.height-1);
     g.setColor(Color.white);
-    
+    g.setFont(new Font(my3ddata.FontType, Font.PLAIN, my3ddata.FontSize));
+
     int px,py,pz;
     int Size;
     int ActPos=0;
@@ -341,7 +321,7 @@ private int  MaxPos=1;
             test=", Avg. Proj.";
         else
             test=", Max. Proj.";
-        g.drawString(test, r.width - test.length() * 9 , 12); // my3ddata.GetUnitsX(-1));       
+        g.drawString(test, r.width - test.length() * my3ddata.FontSize, 12); // my3ddata.GetUnitsX(-1));
         YAxisTitle=YAxisName+" ["+YAxisUnit+"]"+test;
     }
     else
@@ -420,17 +400,17 @@ private int  MaxPos=1;
                         if (my3ddata.ProjMode[DimNr])  // this is not a projection
                         {
                             double ProjVal = my3ddata.ProjValueAt(DimNr,pos,e);
-                            g.drawString(label.CreateValueString(ProjVal), 5 , 12); 
+                            g.drawString(label.CreateValueString(ProjVal), 5 , my3ddata.FontSize);
                         }
                         else
                         {
-                            g.drawString(label.GetValueString(), 5 , 12); 
-                            g.drawString(label.GetPositionString(), 5 , 24); 
+                            g.drawString(label.GetValueString(), 5 , my3ddata.FontSize);
+                            g.drawString(label.GetPositionString(), 5 , 2*my3ddata.FontSize);
                         }
                         if (my3ddata.GetLogMode())
                         {
                         String test="Log. Mode";
-                        g.drawString(test, r.width - test.length() * 9 , 24); // my3ddata.GetUnitsX(-1));
+                        g.drawString(test, r.width - test.length() * my3ddata.FontSize , 2*my3ddata.FontSize); // my3ddata.GetUnitsX(-1));
                         }
                     }
                 }
@@ -495,6 +475,7 @@ public void paint(Graphics g) {
 	// System.out.println("paint xyOff"+xOff+", "+yOff+"\n");
 	
 	g.drawImage(curimage, xOff, yOff , xm, ym, this);
+    g.setFont(new Font(my3ddata.FontType, Font.PLAIN, my3ddata.FontSize));
 
 	// Color bg = getBackground();
 	//g.setColor(bg);
@@ -676,7 +657,7 @@ public void paint(Graphics g) {
                     	didannotate=true;
                    	 	String ListName=my3ddata.GetMarkerListName(l);
                    	 	if (ListName != null && ! ListName.equals(""))
-                   	 		g.drawString(ListName,xp+10 + xDOff,yp+10 + yDOff); 
+                   	 		g.drawString(ListName,xp+my3ddata.FontSize + xDOff,yp+my3ddata.FontSize + yDOff);
                    	 // g.drawString(nf2.format(l+1),xp+10,yp+10); 
                     }
                  }
@@ -764,10 +745,10 @@ public void paint(Graphics g) {
                 test="Avg. Proj.";
             else
                 test="Max. Proj.";
-            g.drawString(test, r.width - test.length() * 9 , 12); // my3ddata.GetUnitsX(-1));
+            g.drawString(test, r.width - test.length() * my3ddata.FontSize, 12); // my3ddata.GetUnitsX(-1));
         }
 
-        g.drawString(mytitle,10,15);
+        g.drawString(mytitle,10,my3ddata.FontSize+8);
     }
 
   public int getCrossHairX() {
@@ -1289,6 +1270,8 @@ public void UpdateAllNoCoord() {
 }
 
 public void UpdateAll() {
+    if (my3ddata.elementsLinked)
+        my3ddata.copyLinkedProperties(my3ddata.ActiveElement);
     UpdateAllNoCoord();
     label.CoordsChanged();
 }
@@ -1319,6 +1302,10 @@ public void keyPressed(KeyEvent e) {
             myChar = ')';
     }
 
+    if (KeyEvent.VK_HOME == e.getKeyCode())
+    {
+        myChar = '°';
+    }
     
     int elem=my3ddata.ActiveElement,t=my3ddata.ActiveTime;
 
@@ -1372,7 +1359,7 @@ public void keyPressed(KeyEvent e) {
     		my3ddata.InvalidateProjs(elem,t);} // only invalidate this element and this time
     	else 
     		{
-    		PreferredCanvas.PositionValue+=advance;
+    		PreferredCanvas.PositionValue += advance;
     		if (PreferredCanvas.PositionValue >= PreferredCanvas.MaxPos-1)
     			PreferredCanvas.PositionValue = PreferredCanvas.MaxPos-1;
     		if (PreferredCanvas.PositionValue <= 0)
@@ -1384,6 +1371,11 @@ public void keyPressed(KeyEvent e) {
     if (myChar != '?')
     	UpdateAll();
     return;
+}
+
+void centerCursor() {
+        otherCanvas1.PositionValue = java.lang.Math.floor(otherCanvas1.MaxPos/2);
+        otherCanvas2.PositionValue = java.lang.Math.floor(otherCanvas2.MaxPos/2);
 }
 
 void SpawnHistogram(boolean forceHistogram) 
@@ -1502,7 +1494,9 @@ void SpawnHistogram(boolean forceHistogram)
  }
 
  public void ExportValues() {
-     PlotWindow myplot = new PlotWindow("View5D Plot",XAxisTitle,YAxisTitle,AxisData,LineData);
+//     PlotWindow myplot = new PlotWindow("View5D Plot",XAxisTitle,YAxisTitle,AxisData,LineData);
+     Plot myplot = new Plot("View5D Plot",XAxisTitle,YAxisTitle);
+     myplot.add("line",AxisData,LineData);
      myplot.draw();
      // return myplot;
    }
@@ -1513,6 +1507,9 @@ public void ProcessKey(char myChar) {
     case ' ':
         ImgDragStarted = true;
 	return;
+	case '°':
+	    centerCursor();
+	    return;
     case 'D':
         my3ddata.DeleteActElement();
 	UpdateAllPanels();
@@ -1558,12 +1555,15 @@ public void ProcessKey(char myChar) {
     	UpdateAll();
 	return;
     case 't':  // automatic threshold adjustment
-	my3ddata.AdjustThresh(false);
-	UpdateAll();
+        if (my3ddata.elementsLinked)
+            my3ddata.AdjustThresh();
+        else
+        	my3ddata.AdjustThresh(false);
+	    UpdateAll();
 	return ;
     case 'T':  // automatic threshold adjustment
-	my3ddata.AdjustThresh(true);
-	UpdateAll();
+        my3ddata.AdjustThresh();
+	    UpdateAll();
 	return ;
     case 'n':  // 
         my3ddata.MarkerDialog();
@@ -2010,12 +2010,16 @@ public void ProcessKey(char myChar) {
     case 'i':
 	//my3ddata.initThresh();
 	InitScaling();
+	otherCanvas1.InitScaling();
+	otherCanvas2.InitScaling();
+	centerCursor();
 	CalcPrev();
 	UpdateAll();
 	return ;
     case 'I':
 	my3ddata.initGlobalThresh();
 	InitScaling();
+	centerCursor();
 	CalcPrev();
 	UpdateAll();
 	return ;

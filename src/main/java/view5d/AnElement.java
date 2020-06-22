@@ -24,16 +24,16 @@
 // import java.awt.color.*;
 package view5d;
 
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.*;
+import java.text.*;
 
 public abstract class AnElement extends Object {
     // Different Data Types, tags listed below
     public static int InvalidType=-10;
-    public static int ByteType = 0, IntegerType = 1, FloatType = 2, DoubleType = 3, ComplexType = 4, ShortType=5, LongType=6;
+    public static int ByteType = 0, IntegerType = 1, FloatType = 2, DoubleType = 3, ComplexType = 4, ShortType=5, LongType=6, UnsignedShortType=7 ;
     public static int NumTypes=7;
-    public static String TypeNames[]={"Byte","Integer","Float","Double","Complex","Short","Long"};  // The last types are converted to integer
-    public static String UTypeNames[]={"Unsigned Byte","Unsigned Integer","Float","Double","Complex","Unsigned Short","Unsigned Long"};  // The last types are converted to integer
+    public static String TypeNames[]={"Byte","Integer","Float","Double","Complex","Short","Long","Unsigned Short"};  // The last types are converted to integer
+    public static String UTypeNames[]={"Unsigned Byte","Unsigned Integer","Float","Double","Complex","Short","Unsigned Long","Unsigned Short"};  // The last types are converted to integer
     public int Sizes[];
     public double Scales[], ScaleV;
     public double OffsetV;  // marks the minimum of the dataset
@@ -68,7 +68,7 @@ public abstract class AnElement extends Object {
         UnitV ="a.u.";
         DataType = InvalidType; // (invalid)
     	nf = java.text.NumberFormat.getNumberInstance(Locale.US);
-    	nf.setMaximumFractionDigits(2);
+    	nf.setMaximumFractionDigits(4);
     	// nf.setMinimumIntegerDigits(7);
     	nf.setGroupingUsed(false);
     }
