@@ -8,12 +8,12 @@
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 2 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-2.0.html>.
@@ -425,8 +425,8 @@ public abstract class AnElement extends Object {
    public int ComputeHistogram(AnElement gate, ROI roi) {  // runs through the given dataset inside the ROI and computes a 3D Histogram
         NameV = "frequency";
         UnitV = "cnts";
-        System.out.println("Computing Histogram with Hscale (X,Y,Z): "+Scales[0]+", "+Scales[1]+", "+Scales[2]+"\n");
-        System.out.println("Offsets: "+Offsets[0]+", "+Offsets[1]+", "+Offsets[2]+"\n");
+        System.out.println("Computing Histogram with Hscale (X,Y,Z): "+Scales[0]+", "+Scales[1]+", "+Scales[2]);
+        System.out.println("Offsets: "+Offsets[0]+", "+Offsets[1]+", "+Offsets[2]);
             
         if (DataToHistogramX == null) {
             System.out.println("Error: No data connected to this histogram");
@@ -484,7 +484,7 @@ public abstract class AnElement extends Object {
                         	SetValueAt(px,py,pz,vali);
                         	if (vali > max) max=vali;
                     }
-        System.out.println("max : "+max+"\n");
+        System.out.println("max : "+max);
         Max = max; Min = 0.0;
         MaxValue = Max; 
         SetScaleShift(0.0,Max);

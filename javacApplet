@@ -1,8 +1,8 @@
 #! /bin/bash -x
 set -e
-cat src/View5D_.java | sed "s/public class View5D_/class View5D_/" | sed "s/class View5D /public class View5D /" | sed "s/ GenericDialog/ AGenericDialog/g" > /tmp/View5D.java
+cat src/view5d/View5D_.java | sed "s/public class View5D_/class View5D_/" | sed "s/class View5D /public class View5D /" | sed "s/ GenericDialog/ AGenericDialog/g" > /tmp/View5D.java
 # | sed "s/import ij.*$//g"
-javac -target 1.1 -deprecation /tmp/View5D.java -classpath "." # -Xlint:unchecked 
+javac -target 1.8 -deprecation /tmp/View5D.java -classpath ".:src/view5d/:/usr/local/ImageJ/ij.jar" # -Xlint:unchecked 
 mv /tmp/*.class .
 jar -cf View5D.jar *.class ij 
 cp View5D.jar /usr/local/KhorosInstall/goodies/data/display/

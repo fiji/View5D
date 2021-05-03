@@ -8,12 +8,12 @@
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 2 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-2.0.html>.
@@ -57,10 +57,12 @@ public class AlternateViewer extends Frame implements WindowListener {
     public AlternateViewer(Container myapplet) {
     super("Alternate Viewer");
     applet = myapplet;
-    if (myapplet != null)
-        setSize(myapplet.getBounds().width,myapplet.getBounds().height);
-    else
-        setSize(500,500);
+    //if (myapplet != null)
+    //    setSize(myapplet.getBounds().width,myapplet.getBounds().height);
+    //else
+     Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+     setSize((int) (size.getWidth()/2),(int) (size.getHeight()/1.5)); // Heuristics
+    // setSize(500,500);
     setVisible(true);
     addWindowListener(this); // register this class for handling the events in it
     }
@@ -98,14 +100,19 @@ public class AlternateViewer extends Frame implements WindowListener {
     }
     
     public void windowClosed(java.awt.event.WindowEvent windowEvent) {
-        cloned=null;
+        cloned=null; // This deletes the data
     if (!(applet instanceof View5D))
 	   ((View5D_) applet).panels.removeElement(mycomponent);  // remove this view from the list
     else
 	   ((View5D) applet).panels.removeElement(mycomponent);  // remove this view from the list
+    if (applet instanceof View5D) {
+            ((View5D) applet).Elements = -1;
+            ((View5D) applet).Times = -1;
+        }
+
     }
     
-    public void windowClosing(java.awt.event.WindowEvent windowEvent) {  // Put the window back into place
+    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
     if (mycomponent instanceof PixelDisplay)
     {
         ((PixelDisplay) mycomponent).c1.myPanel.label.add(mycomponent);
@@ -121,6 +128,11 @@ public class AlternateViewer extends Frame implements WindowListener {
         {
             if (cloned.DataToHistogram.MyHistogram == cloned)
                     cloned.DataToHistogram.MyHistogram = null;
+        }
+    else {
+            if (applet instanceof View5D) {
+                ((View5D) applet).closeAll();
+            }
         }
     setVisible(false);
     }
