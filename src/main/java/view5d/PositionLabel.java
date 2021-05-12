@@ -252,7 +252,12 @@ public class PositionLabel extends Panel implements MouseListener, KeyListener {
     }
 
     String GetValueString() {
+        //try {
         return CreateValueString(data3d.ActElement().GetValueStringAt((int) (c2.PositionValue), (int) (c3.PositionValue), (int) (c1.PositionValue)));
+        //}
+        //catch (ArrayIndexOutOfBoundsException exept) {
+        //    return "";
+        //}
     }
 
     void CoordsChanged() {
@@ -270,6 +275,8 @@ public class PositionLabel extends Panel implements MouseListener, KeyListener {
         boolean colormd = data3d.GetColorMode();
         boolean projmode = data3d.GetProjectionMode(2);
         boolean histconnected = (data3d.DataToHistogram != null);
+
+        //System.out.println("position: " + px+", "+py+", "+pz+", "+elem+", "+pt);
 
         // Rectangle r = PixDisplay.getBounds();
 
