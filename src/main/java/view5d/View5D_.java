@@ -2,18 +2,18 @@
  * #%L
  * View5D plugin for Fiji.
  * %%
- * Copyright (C) 2006 - 2021 Fiji developers.
+ * Copyright (C) 2006 - 2020 Fiji developers.
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 2 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-2.0.html>.
@@ -56,7 +56,7 @@ import ij.gui.*;
 public class View5D_ extends PlugInFrame implements PlugIn, WindowListener {
     public static final long serialVersionUID = 2;
     public static final long serialSubVersionUID = 3;
-    public static final long serialSubSubVersionUID = 5;
+    public static final long serialSubSubVersionUID = 6;
 	// Panel panel;
 	int previousId;
 	ImagePlus imp;

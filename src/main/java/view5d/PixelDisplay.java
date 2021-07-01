@@ -2,18 +2,18 @@
  * #%L
  * View5D plugin for Fiji.
  * %%
- * Copyright (C) 2006 - 2021 Fiji developers.
+ * Copyright (C) 2006 - 2020 Fiji developers.
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 2 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-2.0.html>.
@@ -51,7 +51,7 @@ import java.awt.*;
 import java.util.*;
 import java.text.*;
 
-public class PixelDisplay extends Panel implements MouseListener,ImageObserver,KeyListener {  // A panel displaying the multi-element contens of a single pixel
+public class PixelDisplay extends Panel implements MouseListener,MouseWheelListener,ImageObserver,KeyListener {  // A panel displaying the multi-element contens of a single pixel
     static final long serialVersionUID = 1;
     ImageCanvas c1,c2,c3;
     My3DData data3d;
@@ -95,6 +95,7 @@ public class PixelDisplay extends Panel implements MouseListener,ImageObserver,K
 	    PlotMode = 1;    // Spectrum Plot
 
 	addMouseListener(this); // register this class for handling the events in it
+    addMouseWheelListener(this); // register this class for handling the events in it
 	addKeyListener(this); // register this class for handling the events in it
         
         MyPopupMenu =new PopupMenu("Element Menu");  // tear off menu
@@ -137,6 +138,33 @@ public class PixelDisplay extends Panel implements MouseListener,ImageObserver,K
             AddColorMenu(Bundle.ElementModelName[i],i);
         }
 
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e)
+    {
+        if (e.isShiftDown()) {
+            for (int el = 0; el < data3d.Elements; el++) {
+                double gamma = c1.my3ddata.GetGamma(el);
+                if (e.getWheelRotation() < 0) {
+                    gamma = gamma * 1.125;
+                } else {
+                    gamma = gamma / 1.125;
+                }
+                c1.my3ddata.SetGamma(el, gamma);
+                }
+        }
+        else {
+            int ae = c1.my3ddata.GetActiveElement();
+            double gamma = c1.my3ddata.GetGamma(ae);
+            if (e.getWheelRotation() < 0) {
+                gamma = gamma * 1.125;
+            } else {
+                gamma = gamma / 1.125;
+            }
+            c1.my3ddata.SetGamma(ae, gamma);
+        }
+        c1.UpdateAll();
     }
 
     Color GetBWColor(int e) {
@@ -216,11 +244,12 @@ public class PixelDisplay extends Panel implements MouseListener,ImageObserver,K
                     g.drawString("HZ",(int)(e*sizex+5),(int)(1.66*sizey));
                 if (e == data3d.GateElem)
                     if (data3d.GateActive)
-                        g.drawString("GA",(int)(e*sizex+5),(int) 3.0*sizey);
+                        g.drawString("GA",(int)(e*sizex+5),(int) 2.2*sizey);
                     else
-                        g.drawString("G",(int)(e*sizex+5),(int) 3.0*sizey);
+                        g.drawString("G",(int)(e*sizex+5),(int) 2.2*sizey);
                 if (data3d.InOverlayDispl(e))
-                    g.drawString("Ov",(int)(e*sizex+0) ,(int) 4.0*sizey);
+                    g.drawString("Ov",(int)(e*sizex+0) ,(int) 3.5*sizey);
+                g.drawString(String.format("%.3f", data3d.GetGamma(e)),(int)(e*sizex+5),(int)(4*sizey)); // +(1*sizex/3-10)
             // g.drawString(mytitle,10,10);
             }
         g.setColor(Color.red);
@@ -592,6 +621,19 @@ public class PixelDisplay extends Panel implements MouseListener,ImageObserver,K
     public void mousePressed(MouseEvent e) {
         //if (c1.applet instanceof View5D_)  // ImageJ
         //	((View5D_) c1.applet).setMenuBar(c1.myPanel.MyMenu);
+        if (e.getButton() == java.awt.event.MouseEvent.BUTTON2) {  // This means middle mouse button!
+            if (e.isShiftDown()) {
+                for (int el=0;el<data3d.Elements;el++) {
+                    c1.my3ddata.SetGamma(el, 1.0);
+                    c1.UpdateAll();
+                }
+                return;
+            } else {
+                c1.my3ddata.SetGamma(c1.my3ddata.GetActiveElement(), 1.0);
+                c1.UpdateAll();
+            }
+            return;
+        }
 
         if (e.isPopupTrigger())
         {

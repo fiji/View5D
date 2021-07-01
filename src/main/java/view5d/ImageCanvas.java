@@ -2,18 +2,18 @@
  * #%L
  * View5D plugin for Fiji.
  * %%
- * Copyright (C) 2006 - 2021 Fiji developers.
+ * Copyright (C) 2006 - 2020 Fiji developers.
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 2 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-2.0.html>.
@@ -53,7 +53,7 @@ import ij.gui.*;  // for export of plotwindow
 import java.net.*;
 
 // a canvas represents one view of the data
-public class ImageCanvas extends Canvas implements ImageObserver,MouseListener,MouseMotionListener,KeyListener,FocusListener,AdjustmentListener {
+public class ImageCanvas extends Canvas implements ImageObserver,MouseListener,MouseMotionListener,MouseWheelListener,KeyListener,FocusListener,AdjustmentListener {
     static final long serialVersionUID = 1;
     //int		xadd = 0;
     //int		yadd = 0;
@@ -175,6 +175,7 @@ private int  MaxPos=1;
 	// pickImage();
 	setBounds(0, 0, 100, 100);
 	addMouseListener(this); // register this class for handling the events in it
+    addMouseWheelListener(this); // register this class for handling the events in it
 	addKeyListener(this); // register this class for handling the events in it
 	addMouseMotionListener(this); // register this class for handling the events in it
 	addFocusListener(this); // register this class for handling the events in it
@@ -952,11 +953,55 @@ public void mouseEntered(MouseEvent e) {
     // pickImage();
 }
 
+@Override
+public void mouseWheelMoved(MouseWheelEvent e)
+{
+        if ((e.isShiftDown()) && e.isControlDown())// orthogonal Zoom
+            if (e.getWheelRotation() < 0)
+            {
+                ChangeOrthoZoom(1.0625);
+            }
+            else
+            {
+                ChangeOrthoZoom(1.0 / 1.0625);
+            }
+        else  if (e.isShiftDown()) // update gamma
+        {
+            int ae = my3ddata.GetActiveElement();
+            double gamma = my3ddata.GetGamma(ae);
+            if (e.getWheelRotation() < 0)
+            {
+                gamma = gamma * 1.125;
+            }
+            else
+            {
+                gamma = gamma / 1.125;
+            }
+            my3ddata.SetGamma(ae,gamma);
+            UpdateAll();
+        }
+        else {
+            boolean lock_aspect = e.isControlDown(); // orthogonal Zoom
+            boolean was_locked = otherCanvas2.AspectLocked.getState();
+
+            if (lock_aspect)
+                otherCanvas2.AspectLocked.setState(true);
+
+            if (e.getWheelRotation() < 0) {
+                ChangeZoom(1.125);
+            } else {
+                ChangeZoom(1.0 / 1.125);
+            }
+            otherCanvas2.AspectLocked.setState(was_locked);
+        }
+}
+
 public void mouseClicked(MouseEvent e) {
 	double xOff = my3ddata.ElementAt(my3ddata.ActiveElement).DisplayOffset[otherCanvas1.DimNr];
 	double yOff = my3ddata.ElementAt(my3ddata.ActiveElement).DisplayOffset[otherCanvas2.DimNr];
     APoint Pt=my3ddata.MarkerFromPosition(XFromMouseNoLimit(e.getX())-0.5-xOff,YFromMouseNoLimit(e.getY())-0.5-yOff,DimNr,
                                                 (2*MarkerLists.dx+1)/otherCanvas1.scale,(2*MarkerLists.dy+1)/otherCanvas2.scale);  // , myPanel.getPositions()
+
     if (Pt != null)
     {
     	if (Pt == my3ddata.GetActiveMarker())
@@ -988,6 +1033,13 @@ public void mousePressed(MouseEvent e) {
 	MyPopupMenu.show(this,e.getX(),e.getY());
         return;
     }
+    if (e.getButton() == java.awt.event.MouseEvent.BUTTON2) {  // This means middle mouse button!
+        if (e.isShiftDown()) {
+            my3ddata.SetGamma(my3ddata.GetActiveElement(),1.0);
+            return;
+        }
+    }
+
 
     double xOff = my3ddata.ElementAt(my3ddata.ActiveElement).DisplayOffset[otherCanvas1.DimNr];
 	double yOff = my3ddata.ElementAt(my3ddata.ActiveElement).DisplayOffset[otherCanvas2.DimNr];
@@ -1330,7 +1382,17 @@ public void keyPressed(KeyEvent e) {
     {
         myChar = '°';
     }
-    
+
+    if (KeyEvent.VK_F2== e.getKeyCode())
+    {
+        myChar = '^';
+    }
+
+    if (KeyEvent.VK_F1== e.getKeyCode())
+    {
+        myChar = '?';
+    }
+
     int elem=my3ddata.ActiveElement,t=my3ddata.ActiveTime;
 
     ImageCanvas PreferredCanvas=null;
@@ -1516,6 +1578,43 @@ void SpawnHistogram(boolean forceHistogram)
         return ;
  }
 
+ public void ChangeZoom(double RelZoom) {
+     int xp = getCrossHairX();   // pixel position of the crosshair
+     int yp = getCrossHairY();
+
+     otherCanvas1.scale *= RelZoom;
+     otherCanvas2.scale *= RelZoom;
+     otherCanvas1.dadd += xp-getCrossHairX();
+     otherCanvas2.dadd += yp-getCrossHairY();
+     otherCanvas1.LimitPosition(getBounds().width);
+     otherCanvas2.LimitPosition(getBounds().height);
+     if (otherCanvas2.AspectLocked.getState() || otherCanvas1.AspectLocked.getState())
+     {
+         double zp = getCrossHairZ();
+         scale *=  RelZoom;
+         dadd += zp-getCrossHairZ();
+         LimitPosition(getBounds().height);
+     }
+
+     RedrawAll();
+     label.CoordsChanged();
+     return ;
+ }
+
+ public void ChangeOrthoZoom(double RelZoom) {
+     if (! otherCanvas1.AspectLocked.getState() && ! otherCanvas2.AspectLocked.getState())
+     {
+         if (scale > 1.0)
+         {
+             scale *=  RelZoom;
+             dadd += ( 1.0 -RelZoom)*scale*PositionValue;
+             RedrawAll();
+         }
+     }
+     return ;
+ }
+
+
  public void ExportValues() {
 //     PlotWindow myplot = new PlotWindow("View5D Plot",XAxisTitle,YAxisTitle,AxisData,LineData);
      Plot myplot = new Plot("View5D Plot",XAxisTitle,YAxisTitle);
@@ -1523,6 +1622,13 @@ void SpawnHistogram(boolean forceHistogram)
      myplot.draw();
      // return myplot;
    }
+
+public boolean checkProceed(String txt) { // calls a user dialog to see if the user really wants to proceed
+        AGenericDialog question= new AGenericDialog("Warning!");
+        question.addMessage(txt + " modifies the data.\nDo you really want to proceed?");
+        question.showDialog();
+        return ! question.wasCanceled();
+}
 
 
 public void ProcessKey(char myChar) {
@@ -1534,8 +1640,9 @@ public void ProcessKey(char myChar) {
 	    centerCursor();
 	    return;
     case 'D':
-        my3ddata.DeleteActElement();
-	UpdateAllPanels();
+        if (checkProceed("Delete Element"))
+            my3ddata.DeleteActElement();
+	    UpdateAllPanels();
 	return;
     case 'f':  // upcast datatype to float
         my3ddata.CloneFloat();
@@ -1546,7 +1653,8 @@ public void ProcessKey(char myChar) {
 	UpdateAllPanels();
         return;
     case '+':
-        my3ddata.AddMarkedElement(); // Adds the gate element to the active element
+        if (checkProceed("AddMarkedElement"))
+            my3ddata.AddMarkedElement(); // Adds the gate element to the active element
 	UpdateAllPanels();
 	return;
     case '_':
@@ -1554,15 +1662,18 @@ public void ProcessKey(char myChar) {
 	UpdateAllPanels();
 	return;
     case '-':
-        my3ddata.SubMarkedElement(); // Subtracts the gate element from the active element
+        if (checkProceed("SubtractMarkedElement"))
+            my3ddata.SubMarkedElement(); // Subtracts the gate element from the active element
 	UpdateAllPanels();
 	return;
     case '*':
-        my3ddata.MulMarkedElement(); // Multiplies the gate element with the active element
+        if (checkProceed("MultiplyMarkedElement"))
+            my3ddata.MulMarkedElement(); // Multiplies the gate element with the active element
 	UpdateAllPanels();
 	return;
     case '/':
-        my3ddata.DivMarkedElement(); // Multiplies the gate element with the active element
+        if (checkProceed("DivideMarkedElement"))
+            my3ddata.DivMarkedElement(); // Multiplies the gate element with the active element
 	UpdateAllPanels();
 	return;
     case 'e':  // advance one element cyclicly
@@ -1767,31 +1878,31 @@ public void ProcessKey(char myChar) {
     	AspectLocked.setState(! AspectLocked.getState());
     	return;
     case '#':  
-	my3ddata.SubtractTrackedSpot();
+	    my3ddata.SubtractTrackedSpot();
         my3ddata.InvalidateProjs(-1);  // all projections are invalid
         my3ddata.InvalidateSlices();
-	UpdateAll();
+    	UpdateAll();
 	return;
     case 's': 
         AlternateViewer xx=new AlternateViewer(applet);  // clone the data and open a new viewer
         My3DData nd=new My3DData(my3ddata);
         xx.Assign3DData(applet, null, nd);
-	UpdateAll();
+	    UpdateAll();
         return;
     case 'P':
-	my3ddata.ToggleProj(DimNr,false);
-	label.CoordsChanged();  
-	UpdateAll();
+        my3ddata.ToggleProj(DimNr,false);
+        label.CoordsChanged();
+        UpdateAll();
         return ;
     case 'p':
-	my3ddata.ToggleProj(DimNr,true);
-	UpdateAll();
+	    my3ddata.ToggleProj(DimNr,true);
+	    UpdateAll();
         return ;
     case '^':
-	my3ddata.ActElement().AdvanceReadMode();
-	my3ddata.InvalidateSlices();
-	my3ddata.InvalidateProjs(-1);
-	UpdateAll();
+	    my3ddata.ActElement().AdvanceReadMode();
+	    my3ddata.InvalidateSlices();
+	    my3ddata.InvalidateProjs(-1);
+	    UpdateAll();
         return ;
     case 'S':
         if (! myPanel.ROIstarted && ! LineROIStarted)   // otherwise the user has to finish the ROI first
@@ -1825,7 +1936,7 @@ public void ProcessKey(char myChar) {
         otherCanvas2.scale = scaley;
         otherCanvas1.dadd -= MouseFromX(otherCanvas1.ROIs-0.5);
         otherCanvas2.dadd -= MouseFromY(otherCanvas2.ROIs-0.5);
-	UpdateAll();
+    	UpdateAll();
         return;
     case 'U':  // set Gating-element to this
         my3ddata.toggleGate(-1);   // will force the thresholds to be copied if necessary
@@ -1891,73 +2002,22 @@ public void ProcessKey(char myChar) {
 	// repaint();
 	// updateothers(xprev,yprev);
 	return ;
-    case 'A':
-    	
-        int xp = getCrossHairX();   // pixel position of the crosshair
-        int yp = getCrossHairY();
-    	
-        otherCanvas1.scale *= 1.25;
-        otherCanvas2.scale *= 1.25;
-        otherCanvas1.dadd += xp-getCrossHairX();
-        otherCanvas2.dadd += yp-getCrossHairY();
-        otherCanvas1.LimitPosition(getBounds().width);
-        otherCanvas2.LimitPosition(getBounds().height);
-        if (otherCanvas2.AspectLocked.getState() || otherCanvas1.AspectLocked.getState())
-        {
-            double zp = getCrossHairZ();
-            scale *= 1.25;
-            dadd += zp-getCrossHairZ();
-            LimitPosition(getBounds().height);
-        }
-
-        RedrawAll();
-        label.CoordsChanged(); 
+    case 'A': // Zoom in
+        ChangeZoom(1.25);
         return ;
-    case 'a':
-        xp = getCrossHairX();   // pixel position of the crosshair
-        yp = getCrossHairY();
-    	
-        otherCanvas1.scale /= 1.25;
-        otherCanvas2.scale /= 1.25;
-        otherCanvas1.dadd += xp-getCrossHairX();
-        otherCanvas2.dadd += yp-getCrossHairY();
-        otherCanvas1.LimitPosition(getBounds().width);
-        otherCanvas2.LimitPosition(getBounds().height);
-        if (otherCanvas2.AspectLocked.getState() || otherCanvas1.AspectLocked.getState())
-        {
-            double zp = getCrossHairZ();
-            scale /= 1.25;
-            dadd += zp-getCrossHairZ();
-            LimitPosition(getBounds().height);
-        }
-
-        RedrawAll();
-        label.CoordsChanged(); 
+    case 'a': // Zoom out
+        ChangeZoom(1.0/1.25);
         return ;
-	
-    case '>':
-        if (! otherCanvas1.AspectLocked.getState() && ! otherCanvas2.AspectLocked.getState())
-        {
-	dadd -= 0.125*scale*PositionValue;
-	scale *= 1.25;
-	RedrawAll();
-        }
-	return ;
+    case '>': // Zoom orthogonal to current canval
+        ChangeOrthoZoom(1.215);
+        return ;
     case '<':
-        if (! otherCanvas1.AspectLocked.getState() && ! otherCanvas2.AspectLocked.getState())
-        {
-	if (scale > 1.0)
-	    {
-		scale /= 1.125;
-		dadd += 0.125*scale*PositionValue;
-                RedrawAll();
-	    }
-        }
-	return ;
+        ChangeOrthoZoom(1.0 / 1.125);
+        return ;
     case 'q':
-	DispPlot = ! DispPlot;  // Toggle plot display
-	repaint();
-	return ;
+        DispPlot = ! DispPlot;  // Toggle plot display
+        repaint();
+        return ;
     
     //case ':':
 	//xadd += 5;
@@ -1969,9 +2029,9 @@ public void ProcessKey(char myChar) {
 	//return ;
     case '!':   // transfers the colormap threshold to data threshold
 	// my3ddata.addLThresh(0.02);
-	my3ddata.CThreshToValThresh(-1,0.0,1.0);
-	UpdateAll();
-	return ;
+	    my3ddata.CThreshToValThresh(-1,0.0,1.0);
+	    UpdateAll();
+	    return ;
     case '1':
         if (my3ddata.GateActive && (my3ddata.GateElem == my3ddata.GateElem))
             {
