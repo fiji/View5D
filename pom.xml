@@ -31,6 +31,18 @@
 
 	<developers>
 		<developer>
+			<id>RainerHeintzmann</id>
+			<name>Rainer Heintzmann</name>
+			<url>https://imagej.net/people/RainerHeintzmann</url>
+			<roles>
+				<role>founder</role>
+				<role>lead</role>
+				<role>reviewer</role>
+				<role>support</role>
+				<role>maintainer</role>
+			</roles>
+		</developer>
+		<developer>
 			<id>tinevez</id>
 			<name>Jean-Yves Tinevez</name>
 			<url>https://imagej.net/User:JeanYvesTinevez</url>
@@ -50,11 +62,6 @@
 		</developer>
 	</developers>
 	<contributors>
-		<contributor>
-			<name>Rainer Heintzmann</name>
-			<url>https://imagej.net/User:Heintzmann</url>
-			<roles><role>founder</role></roles>
-		</contributor>
 		<contributor>
 			<name>Johannes Schindelin</name>
 			<url>https://imagej.net/User:Schindelin</url>
