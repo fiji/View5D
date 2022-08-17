@@ -11,7 +11,7 @@
 
 	<groupId>sc.fiji</groupId>
 	<artifactId>View5D_</artifactId>
-	<version>2.3.7-SNAPSHOT</version>
+	<version>2.3.8-SNAPSHOT</version>
 
 	<name>View5D</name>
 	<description>View5D plugin for Fiji.</description>
@@ -30,6 +30,11 @@
 	</licenses>
 
 	<developers>
+		<developer>
+			<name>Rainer Heintzmann</name>
+			<url>https://imagej.net/User:Heintzmann</url>
+			<roles><role>founder</role></roles>
+		</developer>
 		<developer>
 			<id>tinevez</id>
 			<name>Jean-Yves Tinevez</name>
@@ -50,11 +55,6 @@
 		</developer>
 	</developers>
 	<contributors>
-		<contributor>
-			<name>Rainer Heintzmann</name>
-			<url>https://imagej.net/User:Heintzmann</url>
-			<roles><role>founder</role></roles>
-		</contributor>
 		<contributor>
 			<name>Johannes Schindelin</name>
 			<url>https://imagej.net/User:Schindelin</url>
